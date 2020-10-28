@@ -70,13 +70,19 @@ public class MainActivity extends AppCompatActivity {
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         prefAutoUpload = prefs.getBoolean("auto_loc_record", false);
-        String strInterval = prefs.getString("upload_interval", "5");
-        strInterval = strInterval.substring(0, strInterval.indexOf(" "));
-        Toast.makeText(this, "strInterval is " + strInterval, Toast.LENGTH_LONG).show();
-        prefAutoUploadInterval = Integer.parseInt(strInterval);
+        if(prefAutoUpload) {
+            String strInterval = prefs.getString("upload_interval", "5");
+            String[] parts = strInterval.split(" ", 1);
+            Toast.makeText(this, "strInterval: " + strInterval, Toast.LENGTH_LONG).show();
+            prefAutoUploadInterval = Integer.parseInt(parts[0]);
+        }
         prefFullname = prefs.getString("full_name", "");
         prefUserid = prefs.getString("userid", "");
         prefLocDescription = prefs.getString("default_description", "");
+        Toast.makeText(this, "Name: " +  prefFullname, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Userid: " +  prefUserid, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Default description: " +  prefLocDescription, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "You can Modify the settings", Toast.LENGTH_LONG).show();
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
@@ -153,6 +159,7 @@ public class MainActivity extends AppCompatActivity {
         if (lastlocation == null) return;
         try {
             final String description = editTextDescription.getText().toString();
+            final String msgDescr =  description.isEmpty()?  prefLocDescription: description;
             StringRequest request
                     = new StringRequest(Request.Method.POST, posturl,
                     new Response.Listener<String>() {
@@ -173,12 +180,12 @@ public class MainActivity extends AppCompatActivity {
                         throws AuthFailureError {
                     Map<String, String> parameters
                             = new HashMap<String, String>();
-                    parameters.put("userid", "1");
+                    parameters.put("userid", prefUserid);
                     parameters.put("latitude",
                             Double.toString(lastlocation.getLatitude()));
                     parameters.put("longitude",
                             Double.toString(lastlocation.getLongitude()));
-                    parameters.put("description", description);
+                    parameters.put("description", msgDescr);
                     return parameters;
                 }
             };

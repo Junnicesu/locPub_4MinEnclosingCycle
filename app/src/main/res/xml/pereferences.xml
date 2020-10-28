@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="Preference category">
+
+        <EditTextPreference
+            android:defaultValue="Default value"
+            android:key="full_name"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="Enter your full name" />
+        <EditTextPreference
+            android:defaultValue="Default value"
+            android:key="userid"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="Enter your user id"
+            android:inputType="number"/>
+        <EditTextPreference
+            android:defaultValue="Default value"
+            android:key="default_description"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="Enter your default description for the location" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="Preference category">
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="auto_loc_record"
+            android:title="Enable Auto upload your location" />
+        <ListPreference
+            android:defaultValue="1"
+            android:entries="@array/updateInterval"
+            android:entryValues="@array/updateIntervalValues"
+            android:key="upload_interval"
+            android:dependency="auto_loc_record"
+            android:title="Upload interval"
+            android:summary="Define how often your location will be uploaded to the server"/>
+    </PreferenceCategory>
+</PreferenceScreen>

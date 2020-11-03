@@ -2,16 +2,20 @@ package com.example.locpub;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 
+import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -37,6 +41,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
+
 import static androidx.constraintlayout.motion.widget.Debug.getLocation;
 
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
@@ -62,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle("Main");
+        actionBar.setTitle("Location Publisher");
         buttonSave = findViewById(R.id.buttonSave);
         buttonLoc = findViewById(R.id.buttonLoc);
         textSummary = findViewById(R.id.textSummary);
@@ -85,7 +90,25 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(this, "You can Modify the settings", Toast.LENGTH_LONG).show();
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        if(!isNetworkConnected()){
+            Toast.makeText(this, "You need internet", Toast.LENGTH_LONG).show(); //sjdb
+            new AlertDialog.Builder(this)
+                    .setTitle("Internet Connectivity")
+                    .setMessage("Don't you have internet?\nThe app is going to quit!")
 
+                    // Specifying a listener allows you to take an action before dismissing the dialog.
+                    // The dialog is automatically dismissed when a dialog button is clicked.
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // Continue with delete operation
+                            System.exit(0);
+                        }
+                    })
+                    // A null listener allows the button to dismiss the dialog and take no further action.
+                    .setNegativeButton(android.R.string.no, null)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
+        }
         getLocation();
     }
 
@@ -105,6 +128,11 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private boolean isNetworkConnected() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnected();
+    }
 
     private void getLocation() {
         buttonSave.setEnabled(false);
@@ -156,7 +184,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void sendDataToWeb( ) {
-        if (lastlocation == null) return;
+        if (lastlocation == null) {
+            textSummary.setText("last location is null");
+            return;
+        }
         try {
             final String description = editTextDescription.getText().toString();
             final String msgDescr =  description.isEmpty()?  prefLocDescription: description;

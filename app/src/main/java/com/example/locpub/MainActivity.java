@@ -134,6 +134,15 @@ public class MainActivity extends AppCompatActivity {
         return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnected();
     }
 
+    private void enableButtons(){
+        if(prefUserid.isEmpty() || prefFullname.isEmpty()) {
+            buttonSave.setEnabled(false);
+        }
+        else {
+            buttonSave.setEnabled(true);
+        }
+    }
+
     private void getLocation() {
         buttonSave.setEnabled(false);
         textSummary.setText("In permission checking...");
